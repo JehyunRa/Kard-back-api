@@ -19,21 +19,30 @@ module.exports = db => {
     });
   });
 
-  router.put("/users/:name", (request, response) => {
+  router.put("/users", (request, response) => {
 
     const { name, categories, favorites } = request.body;
+    console.log('recieved')
+    console.log('===')
+    console.log(name)
+    console.log(categories)
+    console.log(favorites)
+    console.log('===')
+
 
     // check if user exist in database
     db.query(
       `
       SELECT * FROM users WHERE name = $1::text
      `,
-     [request.params.name]
+     [name]
     )
     .then(({ rows: result }) => {
 
       // if user exist in database
       if (result.length !== 0) {
+        console.log('result length !== 0')
+        console.log('===')
         db.query(
           `
           UPDATE users SET 
@@ -43,18 +52,24 @@ module.exports = db => {
           `,
           [categories, favorites, name]
         ).then(() => {
+          console.log('data saved')
+          console.log('===')
           response.json(`database: data for user ${name} updated`);
         }).catch(error => console.log(error));
 
         // if user doesn't exist in database
       } else {
+        console.log('result length === 0')
+        console.log('===')
         db.query(
           `
-          INSERT INTO budget (name, categories, favorites)
+          INSERT INTO users (name, categories, favorites)
             VALUES ($1::text, $2::json, $3::json)
           `,
           [name, categories, favorites]
         ).then(() => {
+          console.log('data saved')
+          console.log('===')
           response.json(`database: data for user ${name} inserted`);
         }).catch(error => console.log(error));  
       }
