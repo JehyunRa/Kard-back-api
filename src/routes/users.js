@@ -42,12 +42,13 @@ module.exports = db => {
       // if user exist in database
       if (result.length !== 0) {
         console.log('result length !== 0')
+        console.log(result)
         console.log('===')
         db.query(
           `
           UPDATE users SET 
           categories = $1::json,
-          favorites = $2::json,
+          favorites = $2::json
           WHERE name = $3::text
           `,
           [categories, favorites, name]
@@ -60,6 +61,7 @@ module.exports = db => {
         // if user doesn't exist in database
       } else {
         console.log('result length === 0')
+        console.log(result)
         console.log('===')
         db.query(
           `
