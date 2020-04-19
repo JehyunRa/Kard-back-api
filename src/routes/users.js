@@ -1,21 +1,22 @@
 const router = require("express").Router();
 
 module.exports = db => {
-  router.get("/users/:email", (request, response) => {
+  router.get("/users/:user_id", (request, response) => {
     db.query(
       `
       SELECT
         id,
-        email,
+        user_id,
         categories,
         favorites,
         name,
+        email,
         age,
         gender
       FROM users
-      WHERE email = $1::text
+      WHERE user_id = $1::text
     `,
-      [request.params.email]
+      [request.params.user_id]
     ).then(({ rows: user }) => {
       // console.log(user);
       response.json(user);
@@ -24,23 +25,23 @@ module.exports = db => {
 
   router.put("/users", (request, response) => {
 
-    const { email, categories, favorites, name, age, gender } = request.body;
-    // console.log('recieved')
-    // console.log('===')
-    // console.log(email)
-    // console.log(categories)
-    // console.log(favorites)
-    // console.log(name)
-    // console.log(age)
-    // console.log(gender)
-    // console.log('===')
+    const { user_id, categories, favorites, name, email, age, gender } = request.body;
+    console.log('recieved')
+    console.log('===')
+    console.log(user_id)
+    console.log(categories)
+    console.log(favorites)
+    console.log(name)
+    console.log(age)
+    console.log(gender)
+    console.log('===')
 
     // check if user exist in database
     db.query(
       `
-      SELECT * FROM users WHERE email = $1::text
+      SELECT * FROM users WHERE user_id = $1::text
      `,
-     [email]
+     [user_id]
     )
     .then(({ rows: result1 }) => {
 
@@ -55,17 +56,18 @@ module.exports = db => {
           categories = $1::json,
           favorites = $2::json,
           name = $3::text,
-          age = $4::integer,
-          gender = $5::text
-          WHERE email = $6::text
+          email = $4::text,
+          age = $5::integer,
+          gender = $6::text
+          WHERE user_id = $7::text
           `,
-          [categories, favorites, name, age, gender, email]
-        ).then(() => {
-          // console.log('data saved')
-          // console.log('===')
-          // console.log('current data', result2)
-          // console.log('===')
-          response.json(`database: data for user ${email} updated`);
+          [categories, favorites, name, email, age, gender, user_id]
+        ).then(({ rows: result2 }) => {
+          console.log('data saved')
+          console.log('===')
+          console.log('current data', result2)
+          console.log('===')
+          response.json(`database: data for user ${user_id} updated`);
         }).catch(error => console.log(error));
 
         // if user doesn't exist in database
@@ -75,16 +77,16 @@ module.exports = db => {
         // console.log('===')
         db.query(
           `
-          INSERT INTO users (email, categories, favorites, name, age, gender)
-            VALUES ($1::text, $2::json, $3::json, $4::text, $5::integer, $6::text)
+          INSERT INTO users (user_id, categories, favorites, name, email, age, gender)
+            VALUES ($1::text, $2::json, $3::json, $4::text, $5::text, $6::integer, $7::text)
           `,
-          [email, categories, favorites, name, age, gender]
+          [user_id, categories, favorites, name, email, age, gender]
         ).then(({ rows: result2 }) => {
-          // console.log('data saved')
-          // console.log('===')
-          // console.log('current data', result2)
-          // console.log('===')
-          response.json(`database: data for user ${email} inserted`);
+          console.log('data saved')
+          console.log('===')
+          console.log('current data', result2)
+          console.log('===')
+          response.json(`database: data for user ${user_id} inserted`);
         }).catch(error => console.log(error));  
       }
     })
