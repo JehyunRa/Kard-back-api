@@ -8,5 +8,6 @@ CREATE TABLE users (
   name VARCHAR(255),
   email TEXT,
   age INTEGER,
-  gender TEXT
+  gender TEXT,
+  nickname VARCHAR(255)
 );
