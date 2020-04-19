@@ -1,6 +1,22 @@
 const router = require("express").Router();
 
 module.exports = db => {
+  
+  router.get("/kard/:nick", (request, response) => {
+
+    db.query(
+      `
+      SELECT *
+      FROM users
+      WHERE nickname = $1::text
+    `,
+      [ request.params.nick ]
+    ).then(({ rows: results }) => {
+      // console.log(user);
+      response.json(results);
+    });
+  });
+  
   router.get("/users/:user_id", (request, response) => {
     db.query(
       `
@@ -12,7 +28,8 @@ module.exports = db => {
         name,
         email,
         age,
-        gender
+        gender,
+        nickname
       FROM users
       WHERE user_id = $1::text
     `,
@@ -25,7 +42,7 @@ module.exports = db => {
 
   router.put("/users", (request, response) => {
 
-    const { user_id, categories, favorites, name, email, age, gender } = request.body;
+    const { user_id, categories, favorites, name, email, age, gender, nickname } = request.body;
     console.log('recieved')
     console.log('===')
     console.log(user_id)
@@ -34,6 +51,7 @@ module.exports = db => {
     console.log(name)
     console.log(age)
     console.log(gender)
+
     console.log('===')
 
     // check if user exist in database
@@ -58,10 +76,11 @@ module.exports = db => {
           name = $3::text,
           email = $4::text,
           age = $5::integer,
-          gender = $6::text
+          gender = $6::text,
+          nickname= $8::text
           WHERE user_id = $7::text
           `,
-          [categories, favorites, name, email, age, gender, user_id]
+          [categories, favorites, name, email, age, gender, user_id, nickname]
         ).then(({ rows: result2 }) => {
           console.log('data saved')
           console.log('===')
@@ -77,10 +96,10 @@ module.exports = db => {
         // console.log('===')
         db.query(
           `
-          INSERT INTO users (user_id, categories, favorites, name, email, age, gender)
-            VALUES ($1::text, $2::json, $3::json, $4::text, $5::text, $6::integer, $7::text)
+          INSERT INTO users (user_id, categories, favorites, name, email, age, gender, nickname)
+            VALUES ($1::text, $2::json, $3::json, $4::text, $5::text, $6::integer, $7::text, $8::text)
           `,
-          [user_id, categories, favorites, name, email, age, gender]
+          [user_id, categories, favorites, name, email, age, gender, nickname]
         ).then(({ rows: result2 }) => {
           console.log('data saved')
           console.log('===')
